@@ -1157,46 +1157,9 @@ Used when [Processing wait time (in milliseconds) for page update detection] is 
     const CrLfReg = /[\r\n]/gu;
     const spaceReg = / /g;
 
-    /* 必要なくなったのでコメントアウト
     // 使用ブラウザ種類
-    const ua = navigator.userAgent.toLowerCase();
-    let bs = "";
-    let ieVersion = 0;
-    switch (true) {
-        case /fbios|fb_iab/.test(ua): // Facebook
-            bs = "Facebook";
-            break;
-        case /instagram/.test(ua): // Instagram
-            bs = "Instagram";
-            break;
-        case / line\//.test(ua): // LINE
-            bs = "LINE";
-            break;
-        case /msie/.test(ua): // IE ~11
-            ieVersion = parseInt(/msie (\d+)/.exec(ua)[1]);
-        case /trident/.test(ua): // IE 11~
-            bs = "Internet Explorer";
-            break;
-        case /edge/.test(ua):
-        case /edg/.test(ua):
-            bs = "Edge";
-            break;
-        case /chrome|crios/.test(ua): // Chrome for iOS
-            bs = "Chrome";
-            break;
-        case /safari/.test(ua):
-            bs = "Safari";
-            break;
-        case /firefox/.test(ua):
-            bs = "Firefox";
-            break;
-        case /opera|opr/.test(ua):
-            bs = "Opera";
-            break;
-        default:
-            console.warn("ブラウザ検知失敗:",ua)
-    }
-    */
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    console.log("isMobile", isMobile)
 
     log("起動中...");
 
@@ -1583,12 +1546,14 @@ Used when [Processing wait time (in milliseconds) for page update detection] is 
 
         // 処理対象か判定
         let article = card_elem?.firstChild?.firstChild?.firstChild;
+        console.log("l_1", article)
         if (article?.tagName != "ARTICLE") {
             return;
         }
 
         // ユーザー名などの空間取得
         let nameSpace_div = article.querySelectorAll(NAME_SPACE_QUERY);
+        console.log("l_2", NAME_SPACE_QUERY, nameSpace_div)
         nameSpace_div.forEach(div => {
             // 2回目以降はリツイート
             if (messageData._nsOneLoadFlag) {
@@ -1664,6 +1629,7 @@ Used when [Processing wait time (in milliseconds) for page update detection] is 
         pro.push(new Promise(resolve => {
             setTimeout(() => {
                 let attach_img = article.querySelectorAll(IMAGE_QUERY);
+                console.log("l_3", IMAGE_QUERY, attach_img)
                 //console.log(attach_img)
                 if (attach_img) {
                     for (let img of attach_img) {
@@ -1687,6 +1653,7 @@ Used when [Processing wait time (in milliseconds) for page update detection] is 
         // メッセージ取得
         messageData._text_divs = article.querySelectorAll("div[lang]");
         let text_div = messageData._text_divs?.[0];
+        console.log("l_4", "div[lang]", text_div)
 
         let fullStr = "";
         let str = "";
