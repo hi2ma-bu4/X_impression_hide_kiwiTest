@@ -3,3 +3,5 @@
 
 導入リンク: 
 [github.com(script.user.js)](https://github.com/hi2ma-bu4/X_impression_hide_kiwiTest/raw/main/script.user.js)
+
+※検証終了の為このリポジトリは更新されません。
