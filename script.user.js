@@ -5,7 +5,7 @@
 // @name:zh-CN          使用 "display:none;" 隐藏 Twitter（曾用名: 𝕏）的印象收益骗子。
 // @name:zh-TW          使用 "display:none;" 隱藏 Twitter（曾用名: 𝕏）的印象詐騙者。
 // @namespace           https://snowshome.page.link/p
-// @version             1.11.6
+// @version             1.11.7
 // @description         Twitterのインプレゾンビを非表示にしたりブロック・通報するツールです。
 // @description:ja      Twitterのインプレゾンビを非表示にしたりブロック・通報するツールです。
 // @description:en      A tool to hide, block, and report spam on Twitter.
@@ -69,7 +69,11 @@ Twitter(旧:𝕏)のインプレッション小遣い稼ぎ野郎どもをdispla
 
 (function () {
     'use strict';
+    // スマホ判定
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
+
+    // ここから設定
     const DEBUG = false;
 
     // 初期値(定数)
@@ -273,24 +277,19 @@ Twitter(旧:𝕏)のインプレッション小遣い稼ぎ野郎どもをdispla
     const VERIFY_FORMALITY_QUERY = `svg:has([fill^="#"])`;
     const IMAGE_QUERY = `a img, [data-testid="videoComponent"] video`;
     const MENU_BUTTON_QUERY = "[aria-haspopup=menu][role=button]:has(svg)";
-    const MENU_DISP_QUERY_PC = "[role=group] [role=menu]";
-    const MENU_DISP_QUERY_MOBILE = "#layers [role=menu] [role=group]";
-    const BLOCK_QUERY_LIST_PC = [
-        `${MENU_DISP_QUERY_PC} div[role=menuitem]:has(path[d^="M12 3.75c"])`,
+    let MENU_DISP_QUERY;
+    if (isMobile) {
+        MENU_DISP_QUERY = "#layers [role=menu] [role=group]";
+    }
+    else {
+        MENU_DISP_QUERY = "[role=group] [role=menu]";
+    }
+    const BLOCK_QUERY_LIST = [
+        `${MENU_DISP_QUERY} div[role=menuitem]:has(path[d^="M12 3.75c"])`,
         "[role=alertdialog] [role=group] [role=button] div",
     ];
-    const BLOCK_QUERY_LIST_MOBILE = [
-        `${MENU_DISP_QUERY_MOBILE} div[role=menuitem]:has(path[d^="M12 3.75c"])`,
-        "[role=alertdialog] [role=group] [role=button] div",
-    ]
-    const REPORT_QUERY_LIST_PC = [
-        `${MENU_DISP_QUERY_PC} div[role=menuitem]:has(path[d^="M3 2h18"])`,
-        ["[role=radiogroup] label", 5],
-        "[role=group]:has([role=radiogroup]) div[role=button]:not(:has(svg))",
-        ["[role=group] div[role=button]:not(:has(svg))", 1],
-    ];
-    const REPORT_QUERY_LIST_MOBILE = [
-        `${MENU_DISP_QUERY_MOBILE} div[role=menuitem]:has(path[d^="M3 2h18"])`,
+    const REPORT_QUERY_LIST = [
+        `${MENU_DISP_QUERY} div[role=menuitem]:has(path[d^="M3 2h18"])`,
         ["[role=radiogroup] label", 5],
         "[role=group]:has([role=radiogroup]) div[role=button]:not(:has(svg))",
         ["[role=group] div[role=button]:not(:has(svg))", 1],
@@ -1168,9 +1167,6 @@ Used when [Processing wait time (in milliseconds) for page update detection] is 
     const CrLfReg = /[\r\n]/gu;
     const spaceReg = / /g;
 
-    // 使用ブラウザ種類
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
     log("起動中...");
 
     init();
@@ -2016,12 +2012,7 @@ Used when [Processing wait time (in milliseconds) for page update detection] is 
                 blockBtn.value = "Block";
                 div.firstElementChild.appendChild(blockBtn);
                 blockBtn.addEventListener("click", function () {
-                    if (isMobile) {
-                        menuClicker(BLOCK_QUERY_LIST_MOBILE, mesData);
-                    }
-                    else {
-                        menuClicker(BLOCK_QUERY_LIST_PC, mesData);
-                    }
+                    menuClicker(BLOCK_QUERY_LIST, mesData);
                 });
             }
             if (SETTING_LIST.visibleReportButton.data) {
@@ -2030,12 +2021,7 @@ Used when [Processing wait time (in milliseconds) for page update detection] is 
                 reportBtn.value = "Report";
                 div.firstElementChild.appendChild(reportBtn);
                 reportBtn.addEventListener("click", function () {
-                    if (isMobile) {
-                        menuClicker(REPORT_QUERY_LIST_MOBILE, mesData);
-                    }
-                    else {
-                        menuClicker(REPORT_QUERY_LIST_PC, mesData);
-                    }
+                    menuClicker(REPORT_QUERY_LIST, mesData);
                 });
             }
             mesData.card.prepend(div);
@@ -2047,12 +2033,8 @@ Used when [Processing wait time (in milliseconds) for page update detection] is 
             if (SETTING_LIST.autoBlock.data) {
                 console.log(`自動ブロック: ${mesData.name}(${mesData.id})
 理由: ${reason}`);
-                if (isMobile) {
-                    menuClicker(BLOCK_QUERY_LIST_MOBILE, mesData);
-                }
-                else {
-                    menuClicker(BLOCK_QUERY_LIST_PC, mesData);
-                }
+
+                menuClicker(BLOCK_QUERY_LIST_PC, mesData);
             }
 
             // 検知済id保存
