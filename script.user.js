@@ -5,7 +5,7 @@
 // @name:zh-CN          使用 "display:none;" 隐藏 Twitter（曾用名: 𝕏）的印象收益骗子。
 // @name:zh-TW          使用 "display:none;" 隱藏 Twitter（曾用名: 𝕏）的印象詐騙者。
 // @namespace           https://snowshome.page.link/p
-// @version             1.11.2
+// @version             1.11.3
 // @description         Twitterのインプレゾンビを非表示にしたりブロック・通報するツールです。
 // @description:ja      Twitterのインプレゾンビを非表示にしたりブロック・通報するツールです。
 // @description:en      A tool to hide, block, and report spam on Twitter.
@@ -273,11 +273,16 @@ Twitter(旧:𝕏)のインプレッション小遣い稼ぎ野郎どもをdispla
     const VERIFY_FORMALITY_QUERY = `svg:has([fill^="#"])`;
     const IMAGE_QUERY = `a img, [data-testid="videoComponent"] video`;
     const MENU_BUTTON_QUERY = "[aria-haspopup=menu][role=button]:has(svg)";
-    const MENU_DISP_QUERY = "[role=group] [role=menu]";
-    const BLOCK_QUERY_LIST = [
-        `${MENU_DISP_QUERY} div[role=menuitem]:has(path[d^="M12 3.75c"])`,
+    const MENU_DISP_QUERY_PC = "[role=group] [role=menu]";
+    const MENU_DISP_QUERY_PC = "#layers [role=menu] [role=group]";
+    const BLOCK_QUERY_LIST_PC = [
+        `${MENU_DISP_QUERY_PC} div[role=menuitem]:has(path[d^="M12 3.75c"])`,
         "[role=alertdialog] [role=group] [role=button] div",
     ];
+    const BLOCK_QUERY_LIST_MOBILE = [
+        `${MENU_DISP_QUERY_MOBILE} div[role=menuitem]:has(path[d^="M12 3.75c"])`,
+        "[role=alertdialog] [role=group] [role=button] div",
+    ]
     const REPORT_QUERY_LIST = [
         `${MENU_DISP_QUERY} div[role=menuitem]:has(path[d^="M3 2h18"])`,
         ["[role=radiogroup] label", 5],
@@ -1159,7 +1164,6 @@ Used when [Processing wait time (in milliseconds) for page update detection] is 
 
     // 使用ブラウザ種類
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    console.log("isMobile", isMobile)
 
     log("起動中...");
 
@@ -1546,14 +1550,12 @@ Used when [Processing wait time (in milliseconds) for page update detection] is 
 
         // 処理対象か判定
         let article = card_elem?.firstChild?.firstChild?.firstChild;
-        console.log("l_1", article)
         if (article?.tagName != "ARTICLE") {
             return;
         }
 
         // ユーザー名などの空間取得
         let nameSpace_div = article.querySelectorAll(NAME_SPACE_QUERY);
-        console.log("l_2", NAME_SPACE_QUERY, nameSpace_div)
         nameSpace_div.forEach(div => {
             // 2回目以降はリツイート
             if (messageData._nsOneLoadFlag) {
@@ -1629,7 +1631,6 @@ Used when [Processing wait time (in milliseconds) for page update detection] is 
         pro.push(new Promise(resolve => {
             setTimeout(() => {
                 let attach_img = article.querySelectorAll(IMAGE_QUERY);
-                console.log("l_3", IMAGE_QUERY, attach_img)
                 //console.log(attach_img)
                 if (attach_img) {
                     for (let img of attach_img) {
@@ -1653,7 +1654,6 @@ Used when [Processing wait time (in milliseconds) for page update detection] is 
         // メッセージ取得
         messageData._text_divs = article.querySelectorAll("div[lang]");
         let text_div = messageData._text_divs?.[0];
-        console.log("l_4", "div[lang]", text_div)
 
         let fullStr = "";
         let str = "";
@@ -2010,7 +2010,12 @@ Used when [Processing wait time (in milliseconds) for page update detection] is 
                 blockBtn.value = "Block";
                 div.firstElementChild.appendChild(blockBtn);
                 blockBtn.addEventListener("click", function () {
-                    menuClicker(BLOCK_QUERY_LIST, mesData);
+                    if (isMobile) {
+                        menuClicker(BLOCK_QUERY_LIST_MOBILE, mesData);
+                    }
+                    else {
+                        menuClicker(BLOCK_QUERY_LIST_PC, mesData);
+                    }
                 });
             }
             if (SETTING_LIST.visibleReportButton.data) {
@@ -2031,7 +2036,12 @@ Used when [Processing wait time (in milliseconds) for page update detection] is 
             if (SETTING_LIST.autoBlock.data) {
                 console.log(`自動ブロック: ${mesData.name}(${mesData.id})
 理由: ${reason}`);
-                menuClicker(BLOCK_QUERY_LIST, mesData);
+                if (isMobile) {
+                    menuClicker(BLOCK_QUERY_LIST_MOBILE, mesData);
+                }
+                else {
+                    menuClicker(BLOCK_QUERY_LIST_PC, mesData);
+                }
             }
 
             // 検知済id保存
