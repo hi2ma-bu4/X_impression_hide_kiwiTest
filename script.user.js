@@ -5,7 +5,7 @@
 // @name:zh-CN          使用 "display:none;" 隐藏 Twitter（曾用名: 𝕏）的印象收益骗子。
 // @name:zh-TW          使用 "display:none;" 隱藏 Twitter（曾用名: 𝕏）的印象詐騙者。
 // @namespace           https://snowshome.page.link/p
-// @version             1.11.9
+// @version             1.11.10
 // @description         Twitterのインプレゾンビを非表示にしたりブロック・通報するツールです。
 // @description:ja      Twitterのインプレゾンビを非表示にしたりブロック・通報するツールです。
 // @description:en      A tool to hide, block, and report spam on Twitter.
@@ -263,6 +263,8 @@ Twitter(旧:𝕏)のインプレッション小遣い稼ぎ野郎どもをdispla
     const HIDE_CLASS = PRO_NAME + "_none";
     const LOG_CLASS = PRO_NAME + "_log";
     const VERIFY_CLASS = PRO_NAME + "_verify";
+    const PC_FLAG_CLASS = PRO_NAME + "_pc";
+    const MOBILE_FLAG_CLASS = PRO_NAME + "_mobile";
     const EX_MENU_ID = PRO_NAME + "_menu";
     const EX_MENU_OPEN_CLASS = EX_MENU_ID + "_open";
     const EX_MENU_ITEM_BASE_ID = EX_MENU_ID + "_item_";
@@ -392,6 +394,9 @@ Twitter(旧:𝕏)のインプレッション小遣い稼ぎ野郎どもをdispla
 }
 
 /* メニュー表示設定 */
+#${EX_MENU_ID}.${MOBILE_FLAG_CLASS} {
+    font-size: 0.8em;
+}
 #${EX_MENU_ID} textarea {
     width: 95%;
     resize: vertical;
@@ -1426,6 +1431,12 @@ Used when [Processing wait time (in milliseconds) for page update detection] is 
         exMenuDOM = document.createElement("div");
         exMenuDOM.id = EX_MENU_ID;
         exMenuDOM.lang = SETTING_LIST.language.data;
+        if (isMobile) {
+            exMenuDOM.classList.add(MOBILE_FLAG_CLASS);
+        }
+        else {
+            exMenuDOM.classList.add(PC_FLAG_CLASS);
+        }
         exMenuDOM.appendChild(w_exMenuDOM);
     }
 
